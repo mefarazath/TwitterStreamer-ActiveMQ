@@ -7,7 +7,8 @@
 
      <groupId>org.wso2.cep.uima</groupId>	
     <artifactId>org.wso2.cpe.uima.twitter-streamer</artifactId>
-    <version>1.0.0</version>	
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -47,7 +48,17 @@
                 </executions>
                 <configuration>
                     <mainClass>org.wso2.cep.uima.demo.TwitterStreamer</mainClass>
+                    <arguments>
+                        <argument>
+                            tcp://localhost:61616
+                        </argument>
+                        <argument>
+                            TwitterExtractedFeed
+                        </argument>
+                        </arguments>
+
                 </configuration>
+
             </plugin>
 
 	

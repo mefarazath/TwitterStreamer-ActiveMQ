@@ -1,8 +1,8 @@
 package org.wso2.cep.uima.demo;
 
-import org.wso2.cep.uima.demo.data.Tweet;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import twitter4j.*;
+
 import javax.jms.*;
 
 /***
@@ -49,12 +49,9 @@ public class StatusHandler implements StatusListener{
 			throw new NullPointerException("ActiveMQ producer not set for StatusHandler");
 		}
 
-
-		Tweet tweet = new Tweet(status.getId(), status.getCreatedAt(), status.getText());
-
 		// send the tweet to the queue
 		try {
-			TextMessage tweetMessage = session.createTextMessage(tweet.getText());
+			TextMessage tweetMessage = session.createTextMessage(status.getText());
 			producer.send(tweetMessage);
 		} catch (JMSException e) {
 			e.printStackTrace();

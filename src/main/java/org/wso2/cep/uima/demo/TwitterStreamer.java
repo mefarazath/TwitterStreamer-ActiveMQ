@@ -1,7 +1,9 @@
 package org.wso2.cep.uima.demo;
 
-
 import org.apache.log4j.PropertyConfigurator;
+import org.wso2.cep.uima.demo.Util.TwitterConfiguration;
+import org.wso2.cep.uima.demo.Util.TwitterConfigurationBuiler;
+import org.xml.sax.SAXException;
 import twitter4j.FilterQuery;
 import twitter4j.Logger;
 import twitter4j.TwitterStream;
@@ -9,10 +11,12 @@ import twitter4j.TwitterStreamFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
 import javax.jms.JMSException;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 
 public class TwitterStreamer {
 	
-	// API keys for the TwitterStreaming API
+    // API keys for the TwitterStreaming API
     private String consumerKey = "IxEX6LoI3Hcp91JX6KHEVECKu";
     private String consumerSecret = "vr4RRmrT7UvKQO703Z3K9U5MsFzc7G8N7M8IBLzWQn3BrCQGIE";
     private String accessToken = "711930980-dThMw79BL0i33dOpfCZBqDYH8FWIeQYXdkKOsvfa";
@@ -29,24 +33,35 @@ public class TwitterStreamer {
 
     private static Logger logger = Logger.getLogger(TwitterStreamer.class);
 
-    public static void main(String[] args) throws JMSException {
+    public static void main(String[] args) throws JMSException, IOException,
+                                            SAXException, ParserConfigurationException {
 
         usersToFilter = new long[] { 711930980, 808888003, 4366881, 2984541727l };
-        String JMSUrl = "tcp://localhost:61616";
-        String queueName = "TwitterStreamingFeed";
 
-        //get these through config parser
+        String JMSUrl = args[0];
+        String queueName = args[1];
+
+	if(JMSUrl.equals("") || queueName.equals("")){
+		System.out.println("Usage ant -DjmsUrl=<JMS_URL> -DqueueName=<QUEUE_NAME>");
+		System.exit(0);
+	}
+
+        TwitterConfigurationBuiler configBuilder = new TwitterConfigurationBuiler("twitterConfig.xml");
+        TwitterConfiguration config = configBuilder.getStreamingConfiguration();
+
+       /* //get these through config parser
         String consumerKey = "IxEX6LoI3Hcp91JX6KHEVECKu";
         String consumerSecret = "vr4RRmrT7UvKQO703Z3K9U5MsFzc7G8N7M8IBLzWQn3BrCQGIE";
         String accessToken = "711930980-dThMw79BL0i33dOpfCZBqDYH8FWIeQYXdkKOsvfa";
-        String accessTokenSecret = "kgVIchdQrkjKPZoReBMECSLoyPegEHm2Y8mi8BLqDQEtP";
+        String accessTokenSecret = "kgVIchdQrkjKPZoReBMECSLoyPegEHm2Y8mi8BLqDQEtP";*/
+
 
         // create a streamer object
-        TwitterStreamer streamer = new TwitterStreamer(usersToFilter, JMSUrl);
-        streamer.setConsumerSecret(consumerSecret);
-        streamer.setConsumerKey(consumerKey);
-        streamer.setAccessToken(accessToken);
-        streamer.setAccessTokenSecret(accessTokenSecret);
+        TwitterStreamer streamer = new TwitterStreamer(config.getFollowers(), JMSUrl);
+        streamer.setConsumerSecret(config.getConsumerSecret());
+        streamer.setConsumerKey(config.getConsumerKey());
+        streamer.setAccessToken(config.getAccessToken());
+        streamer.setAccessTokenSecret(config.getAccessTokenSecret());
 
         if(JMSUrl == null)
             throw new NullPointerException("ActiveMQ URL not set");
