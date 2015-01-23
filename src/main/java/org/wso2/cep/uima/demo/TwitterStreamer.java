@@ -17,10 +17,10 @@ import java.io.IOException;
 public class TwitterStreamer {
 	
     // API keys for the TwitterStreaming API
-    private String consumerKey = "IxEX6LoI3Hcp91JX6KHEVECKu";
-    private String consumerSecret = "vr4RRmrT7UvKQO703Z3K9U5MsFzc7G8N7M8IBLzWQn3BrCQGIE";
-    private String accessToken = "711930980-dThMw79BL0i33dOpfCZBqDYH8FWIeQYXdkKOsvfa";
-    private String accessTokenSecret = "kgVIchdQrkjKPZoReBMECSLoyPegEHm2Y8mi8BLqDQEtP";
+    private String consumerKey;
+    private String consumerSecret;
+    private String accessToken;
+    private String accessTokenSecret;
 
     // Configuration parameters of the ActiveMQ Message Broker
     private String JMSUrl;
@@ -36,8 +36,6 @@ public class TwitterStreamer {
     public static void main(String[] args) throws JMSException, IOException,
                                             SAXException, ParserConfigurationException {
 
-        usersToFilter = new long[] { 711930980, 808888003, 4366881, 2984541727l };
-
         String JMSUrl = args[0];
         String queueName = args[1];
 
@@ -46,15 +44,7 @@ public class TwitterStreamer {
 		System.exit(0);
 	}
 
-        TwitterConfigurationBuiler configBuilder = new TwitterConfigurationBuiler("twitterConfig.xml");
-        TwitterConfiguration config = configBuilder.getStreamingConfiguration();
-
-       /* //get these through config parser
-        String consumerKey = "IxEX6LoI3Hcp91JX6KHEVECKu";
-        String consumerSecret = "vr4RRmrT7UvKQO703Z3K9U5MsFzc7G8N7M8IBLzWQn3BrCQGIE";
-        String accessToken = "711930980-dThMw79BL0i33dOpfCZBqDYH8FWIeQYXdkKOsvfa";
-        String accessTokenSecret = "kgVIchdQrkjKPZoReBMECSLoyPegEHm2Y8mi8BLqDQEtP";*/
-
+        TwitterConfiguration config = TwitterConfigurationBuiler.getTwitterConfiguration();
 
         // create a streamer object
         TwitterStreamer streamer = new TwitterStreamer(config.getFollowers(), JMSUrl);
@@ -62,9 +52,6 @@ public class TwitterStreamer {
         streamer.setConsumerKey(config.getConsumerKey());
         streamer.setAccessToken(config.getAccessToken());
         streamer.setAccessTokenSecret(config.getAccessTokenSecret());
-
-        if(JMSUrl == null)
-            throw new NullPointerException("ActiveMQ URL not set");
 
         // create the status handler of the stream
         StatusHandler statusHandler = new StatusHandler(JMSUrl, queueName);
