@@ -29,7 +29,7 @@ public class TwitterStreamer {
     private TwitterStream twitterStream;
     private FilterQuery filter;
 
-    private static long[] usersToFilter; // userIDs of the users to filter when the streaming tweets
+    private long[] usersToFilter; // userIDs of the users to filter when the streaming tweets
 
     private static Logger logger = Logger.getLogger(TwitterStreamer.class);
 
