@@ -29,7 +29,7 @@ public class TwitterStreamer {
     private TwitterStream twitterStream;
     private FilterQuery filter;
 
-    private long[] usersToFilter; // userIDs of the users to filter when the streaming tweets
+    private final long[] usersToFilter; // userIDs of the users to filter when the streaming tweets
 
     private static Logger logger = Logger.getLogger(TwitterStreamer.class);
 
@@ -67,7 +67,7 @@ public class TwitterStreamer {
      */
     public TwitterStreamer(long[] users, String JMSUrl){
         this.JMSUrl = JMSUrl;
-        this.usersToFilter = users;
+        this.usersToFilter = users.clone();
         PropertyConfigurator.configure("src/main/resources/log4j.properties");
     }
 
@@ -93,10 +93,12 @@ public class TwitterStreamer {
      */
     private void buildConfiguration(){
         cb = new ConfigurationBuilder();
-        Logger.getLogger(TwitterStreamer.class).debug("Building Configuration");
+        logger.debug("Building Configuration");
 
-        if(consumerKey == null || consumerSecret == null || accessToken == null || accessTokenSecret == null)
+        if(consumerKey == null || consumerSecret == null || accessToken == null || accessTokenSecret == null){
+            logger.error("Twitter API keys not set properly in twitterConfig.xml");
             throw new NullPointerException("TWitter API Keys not set");
+        }
 
         cb.setDebugEnabled(true)
     	  .setOAuthConsumerKey(consumerKey)
